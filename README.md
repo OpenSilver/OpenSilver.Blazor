@@ -1,2 +1,5 @@
 # OpenSilver.Blazor
-Samples of: 1. How to add XAML to a Blazor project via OpenSilver, and 2. How to add Blazor/Razor files to an OpenSilver project
+This repo contains 2 samples:
+
+1. How to add XAML to a Blazor project via OpenSilver
+2. How to add Blazor/Razor files to an OpenSilver project
