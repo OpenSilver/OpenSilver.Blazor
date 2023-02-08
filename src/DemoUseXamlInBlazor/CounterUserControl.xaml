@@ -1,0 +1,17 @@
+﻿<UserControl
+    x:Class="DemoUseXamlInBlazor.CounterUserControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <StackPanel Margin="10">
+        <TextBlock FontSize="14" FontWeight="Bold">
+            Current count: <Run Text="{Binding CurrentCount}"/>
+        </TextBlock>
+        <Button Content="Click me"
+                Click="ButtonIncrementCount_Click"
+                FontSize="14"
+                FontWeight="Bold"
+                Margin="0,10,0,0"/>
+        <ListBox x:Name="ListBox1"/>
+    </StackPanel>
+</UserControl>
+    

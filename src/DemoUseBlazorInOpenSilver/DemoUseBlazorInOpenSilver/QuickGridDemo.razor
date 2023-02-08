@@ -1,0 +1,22 @@
+﻿@using Microsoft.AspNetCore.Components.QuickGrid
+@using OpenSilver.Blazor;
+
+<h3>Quick Grid Component Test</h3>
+
+<QuickGrid Items="@People">
+    <PropertyColumn Property="@(p => p.PersonId)" Sortable="true" />
+    <PropertyColumn Property="@(p => p.Name)" Sortable="true" />
+    <PropertyColumn Property="@(p => p.BirthDate)" Format="yyyy-MM-dd" Sortable="true" />
+</QuickGrid>
+
+@code {
+    public record Person(int PersonId, string Name, DateOnly BirthDate);
+
+    [Parameter]
+    public IQueryable<Person> People { get; set; }
+
+    public void Refresh()
+    {
+        this.StateHasChanged();
+    }
+}

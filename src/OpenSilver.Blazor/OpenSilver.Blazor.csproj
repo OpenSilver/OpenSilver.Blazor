@@ -1,0 +1,35 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+  <PropertyGroup>
+	  <TargetFramework>net7.0</TargetFramework>
+	  <!--<TargetFramework>net6.0</TargetFramework>-->
+	  <!--<TargetFramework>netstandard2.0</TargetFramework>-->
+    <EnableDefaultItems>false</EnableDefaultItems>
+    <DefineSilverlight>true</DefineSilverlight>
+  </PropertyGroup>
+
+  <ItemGroup>
+	<SupportedPlatform Include="browser" />
+  </ItemGroup>
+	
+  <ItemGroup>
+	  <PackageReference Include="OpenSilver" Version="1.1.0" />
+	  <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="7.0.1" />
+	  <!--<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="6.0.7" />-->
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="RazorComponent.cs" />
+    <Compile Include="UnmarshalledJavaScriptExecutionHandler.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="RazorComponentInstantiator.razor" />
+    <Content Include="RazorComponentIntantiatorDefaultContent.razor" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="XamlElement.razor" />
+  </ItemGroup>
+
+</Project>

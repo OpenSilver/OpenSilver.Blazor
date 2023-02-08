@@ -1,0 +1,100 @@
+﻿@namespace OpenSilver
+
+@using OpenSilver.Blazor;
+@using DotNetForHtml5;
+@using Microsoft.JSInterop;
+@using System.Windows;
+@using System.Reflection;
+
+<div id="test1"><strong>XAML element not loaded, see <a href="https://opensilver.net/permalinks/xaml_not_loaded_in_blazor.aspx" target="_blank">Troubleshooting Tips</a></strong></div>
+
+@code {
+    protected override Task OnAfterRenderAsync(bool firstRender)
+    {
+        // Instantiate the "Application" class (only once):
+        if (System.Windows.Application.Current == null)
+        {
+            Cshtml5Initializer.Initialize(new UnmarshalledJavaScriptExecutionHandler(JSRuntime));
+            var _ = new System.Windows.Application();
+        }
+
+        // Instantiate the XAML type:
+        var type = this.Type; //System.Type.GetType(this.Type);
+        if (type is null)
+            throw new InvalidOperationException("Type not found: " + this.Type ?? "(no type specified)");
+        var instance = Activator.CreateInstance(type);
+
+        // Pass all the parameters to the XAML instance:
+        if (Parameters != null)
+        {
+            foreach (var parameter in Parameters)
+            {
+                string parameterName = parameter.Key;
+                object parameterValue = parameter.Value;
+                SetPropertyValue(instance, parameterName, parameterValue);
+            }
+        }
+
+        // Instantiate a new XAML "Window" (a new Visual Tree root) and set its content to be the XAML content:
+        var window = new System.Windows.Window();
+        var div = OpenSilver.Interop.ExecuteJavaScript("document.getElementById('test1')");
+        OpenSilver.Interop.ExecuteJavaScript("$0.innerHTML = ''", div);
+        window.AttachToDomElement(div);
+        window.Content = (FrameworkElement)instance;
+
+        return base.OnAfterRenderAsync(firstRender);
+    }
+
+    [Inject]
+    private IJSRuntime JSRuntime { get; set; }
+
+    [Parameter]
+    public Type Type { get; set; }
+
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object> Parameters { get; set; }
+
+    static void SetPropertyValue(object obj, string propertyName, object value)
+    {
+        Type xamlType = obj.GetType();
+        PropertyInfo? propertyInfo = xamlType.GetProperty(propertyName);
+        if(propertyInfo != null)
+        {
+            // Convert the value if needed:
+            object convertedValue;
+            //if (value is string)
+            //    convertedValue = global::OpenSilver.Internal.Xaml.RuntimeHelpers.GetPropertyValue(xamlType, propertyName, (string)value, () => value);
+            //else
+            if (value is IConvertible)
+                convertedValue = Convert.ChangeType(value, propertyInfo.PropertyType);
+            else
+                convertedValue = value;
+
+            // Set the value:
+            propertyInfo.SetValue(obj, convertedValue, null);
+        }
+        else
+        {
+            Console.WriteLine("XAML element property not found: " + propertyName);
+            // Fails silently
+        }
+    }
+
+    /*
+    private Dictionary<string, object> _parameters;
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object> Parameters
+        {
+        get { return _parameters; }
+            set
+            {
+            _parameters = value;
+            foreach (var item in value)
+                {
+                Console.WriteLine("XAMLEMEMENT " + item.Key + ": " + (item.Value ?? "").ToString());
+                }
+                    }
+                        }
+    */
+
+}
