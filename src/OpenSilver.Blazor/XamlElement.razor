@@ -5,28 +5,41 @@
 @using Microsoft.JSInterop;
 @using System.Windows;
 @using System.Reflection;
+@using System.ComponentModel;
 
 <div style="position: relative; width: 100%; height: 100%; overflow-x: hidden; overflow-y: hidden"> @*This div prevents the elements in the XamlElement from overflowing outside of the XamlElement area (popups for example)*@
     <div id="test1"><strong>XAML element not loaded, see <a href="https://opensilver.net/permalinks/xaml_not_loaded_in_blazor.aspx" target="_blank">Troubleshooting Tips</a></strong></div>
 </div>
 
 @code {
+    object? instance;
 
     protected override Task OnAfterRenderAsync(bool firstRender)
     {
-        // Instantiate the "Application" class (only once):
-        if (System.Windows.Application.Current == null)
+        if (firstRender) //if it is the first time we add the element to the page, create a new instance of the Xaml Control. Otherwise, skip that step and simply update the potential parameters that nee to be passed to the instance.
         {
-            Cshtml5Initializer.Initialize(new UnmarshalledJavaScriptExecutionHandler(JSRuntime));
-            var _ = new System.Windows.Application();
-            Window.Current.Content = new System.Windows.Controls.Border(); //Adding a Content to the Main Window to avoid some errors.
-        }
+            // Instantiate the "Application" class (only once):
+            if (System.Windows.Application.Current == null)
+            {
+                Cshtml5Initializer.Initialize(new UnmarshalledJavaScriptExecutionHandler(JSRuntime));
+                var _ = new System.Windows.Application();
+                Window.Current.Content = new System.Windows.Controls.Border(); //Adding a Content to the Main Window to avoid some errors.
+            }
 
-        // Instantiate the XAML type:
-        var type = this.Type; //System.Type.GetType(this.Type);
-        if (type is null)
-            throw new InvalidOperationException("Type not found: " + this.Type ?? "(no type specified)");
-        var instance = Activator.CreateInstance(type);
+            // Instantiate the XAML type:
+            var type = this.Type; //System.Type.GetType(this.Type);
+            if (type is null)
+                throw new InvalidOperationException("Type not found: " + this.Type ?? "(no type specified)");
+            instance = Activator.CreateInstance(type);
+
+
+            // Instantiate a new XAML "Window" (a new Visual Tree root) and set its content to be the XAML content:
+            var window = new System.Windows.Window();
+            var div = OpenSilver.Interop.ExecuteJavaScript("document.getElementById('test1')");
+            OpenSilver.Interop.ExecuteJavaScript("$0.innerHTML = ''", div);
+            window.AttachToDomElement(div);
+            window.Content = (FrameworkElement)instance;
+        }
 
         // Pass all the parameters to the XAML instance:
         if (Parameters != null)
@@ -38,13 +51,6 @@
                 SetPropertyValue(instance, parameterName, parameterValue);
             }
         }
-
-        // Instantiate a new XAML "Window" (a new Visual Tree root) and set its content to be the XAML content:
-        var window = new System.Windows.Window();
-        var div = OpenSilver.Interop.ExecuteJavaScript("document.getElementById('test1')");
-        OpenSilver.Interop.ExecuteJavaScript("$0.innerHTML = ''", div);
-        window.AttachToDomElement(div);
-        window.Content = (FrameworkElement)instance;
 
         return base.OnAfterRenderAsync(firstRender);
     }
