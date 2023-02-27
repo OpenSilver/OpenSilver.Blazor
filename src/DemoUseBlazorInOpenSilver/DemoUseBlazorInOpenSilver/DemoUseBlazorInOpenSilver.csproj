@@ -9,7 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-	<PackageReference Include="OpenSilver" Version="1.1.0" />
+	<PackageReference Include="OpenSilver" Version="1.2.0-preview-2023-02-13-213823-6da652f8" />
 	<PackageReference Include="Microsoft.AspNetCore.Components.QuickGrid" Version="0.1.0-alpha.22351.1" />
   </ItemGroup>
 

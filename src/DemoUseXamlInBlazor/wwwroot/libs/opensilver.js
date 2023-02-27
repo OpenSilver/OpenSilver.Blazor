@@ -13,131 +13,101 @@
 *
 \*====================================================================================*/
 
+// Load all css and js files
+(function (names) {
+    names.forEach((name) => {
+        var extension = name.split('.').pop();
+        var url = name + "?date=" + new Date().toISOString();
+        if (extension == 'js') {
+            var el = document.createElement('script');
+            el.setAttribute('type', 'application/javascript');
+            el.setAttribute('src', url);
+            document.getElementsByTagName('head')[0].appendChild(el);
+        }
+        else if (extension == 'css') {
+            var el = document.createElement('link');
+            el.setAttribute('rel', 'stylesheet');
+            el.setAttribute('type', 'text/css');
+            el.setAttribute('href', url);
+            document.getElementsByTagName('head')[0].appendChild(el);
+        }
+    });
+}(['libs/cshtml5.css',
+    'libs/flatpickr.css',
+    'libs/quill.core.css',
+    'libs/cshtml5.js',
+    'libs/velocity.js',
+    'libs/flatpickr.js',
+    'libs/ResizeSensor.js',
+    'libs/ResizeObserver.js',    
+    'libs/quill.min.js',
+    'libs/html2canvas.js']));
 
+window.onCallBack = (function () {
+    const opensilver = "OpenSilver";
+    const opensilver_js_callback = "OnCallbackFromJavaScriptBrowser";
+    const opensilver_js_error_callback = "OnCallbackFromJavaScriptError";
 
-//new Element("link",   { rel:"stylesheet", src: "cshtml5.css", type: "text/css" });
-var link = document.createElement('link');
-link.setAttribute('rel', 'stylesheet');
-link.setAttribute('type', 'text/css');
-link.setAttribute('href', 'libs/cshtml5.css');
-document.getElementsByTagName('head')[0].appendChild(link);
+    function prepareCallbackArgs(args) {
+        let callbackArgs;
+        switch (typeof args) {
+            case 'number':
+            case 'string':
+            case 'boolean':
+                callbackArgs = args;
+                break;
+            case 'object':
+                // if we deal with an array, we need to check
+                // that all the items are primitive types.
+                if (Array.isArray(args)) {
+                    callbackArgs = [];
+                    for (let i = 0; i < args.length; i++) {
+                        let itemType = typeof args[i];
+                        if ((args[i] === null || itemType === 'number' || itemType === 'string' || itemType === 'boolean' ||
+                            // Check for TypedArray. This is used for reading binary data for FileReader for example
+                            (ArrayBuffer.isView(args[i]) && !(args[i] instanceof DataView))
+                        )) {
+                            callbackArgs.push(args[i]);
+                        } else {
+                            callbackArgs.push(undefined);
+                        }
+                    }
+                    break;
+                }
+            // if args === null, fall to next case.
+            case 'undefined':
+            default:
+                callbackArgs = [];
+                break;
+        }
 
-//new Element("link",   { rel:"stylesheet", src: "flatpickr.css", type: "text/css" });
-var link = document.createElement('link');
-link.setAttribute('rel', 'stylesheet');
-link.setAttribute('type', 'text/css');
-link.setAttribute('href', 'libs/flatpickr.css');
-document.getElementsByTagName('head')[0].appendChild(link);
+        return callbackArgs;
+    }
 
-//new Element("script", { src: "cshtml5.js", type: "application/javascript" });
-var cshtml5Script = document.createElement('script');
-cshtml5Script.setAttribute('type', 'application/javascript');
-cshtml5Script.setAttribute('src', 'libs/cshtml5.js');
-document.getElementsByTagName('head')[0].appendChild(cshtml5Script);
+    return {
+        OnCallbackFromJavaScript: function (callbackId, idWhereCallbackArgsAreStored, callbackArgsObject, returnValue) {
+            let formattedArgs = prepareCallbackArgs(callbackArgsObject);
+            const res = DotNet.invokeMethod(opensilver, opensilver_js_callback, callbackId, idWhereCallbackArgsAreStored, formattedArgs, returnValue || false);
+            if (returnValue) {
+                return res;
+            }
+        },
 
-//new Element("script", { src: "fastclick.js", type: "application/javascript" });
-var fastclickScript = document.createElement('script');
-fastclickScript.setAttribute('type', 'application/javascript');
-fastclickScript.setAttribute('src', 'libs/fastclick.js');
-document.getElementsByTagName('head')[0].appendChild(fastclickScript);
-
-//new Element("script", { src: "velocity.js", type: "application/javascript" });
-var velocityScript = document.createElement('script');
-velocityScript.setAttribute('type', 'application/javascript');
-velocityScript.setAttribute('src', 'libs/velocity.js');
-document.getElementsByTagName('head')[0].appendChild(velocityScript);
-
-//new Element("script", { src: "flatpickr.js", type: "application/javascript" });
-var velocityScript = document.createElement('script');
-velocityScript.setAttribute('type', 'application/javascript');
-velocityScript.setAttribute('src', 'libs/flatpickr.js');
-document.getElementsByTagName('head')[0].appendChild(velocityScript);
-
-
-//new Element("script", { src: "ResizeSensor.js", type: "application/javascript" });
-var velocityScript = document.createElement('script');
-velocityScript.setAttribute('type', 'application/javascript');
-velocityScript.setAttribute('src', 'libs/ResizeSensor.js');
-document.getElementsByTagName('head')[0].appendChild(velocityScript);
-
-//new Element("script", { src: "ResizeObserver.js", type: "application/javascript" });
-var velocityScript = document.createElement('script');
-velocityScript.setAttribute('type', 'application/javascript');
-velocityScript.setAttribute('src', 'libs/ResizeObserver.js');
-document.getElementsByTagName('head')[0].appendChild(velocityScript);
-
-
-window.onCallBack = (function() {
-	const opensilver = "OpenSilver";
-	const opensilver_js_callback = "OnCallbackFromJavaScriptBrowser";
-	const opensilver_js_error_callback = "OnCallbackFromJavaScriptError";
-	
-	function prepareCallbackArgs (args) {
-		let callbackArgs;
-		switch (typeof args) {
-			case 'number':
-			case 'string':
-			case 'boolean':
-				callbackArgs = args;
-				break;
-			case 'object':
-				// if we deal with an array, we need to check
-				// that all the items are primitive types.
-				if (Array.isArray(args)) {
-					callbackArgs = args;
-					for (let i = 0; i < args.length; i++) {
-						let itemType = typeof args[i];
-						if (!(args[i] === null || itemType === 'number' || itemType === 'string' || itemType === 'boolean' ||
-							// Check for TypedArray. This is used for reading binary data for FileReader for example
-							(ArrayBuffer.isView(args[i]) && !(args[i] instanceof DataView))
-						)) {
-							callbackArgs = [];
-							break;
-						}
-					}
-					break;
-				}
-				// if args === null, fall to next case.
-			case 'undefined':
-			default:
-				callbackArgs = [];
-				break;
-		}
-	
-		return callbackArgs;
-	}
-	
-	return {
-		OnCallbackFromJavaScript : function (callbackId, idWhereCallbackArgsAreStored, callbackArgsObject, returnValue) {
-			let formattedArgs = prepareCallbackArgs(callbackArgsObject);
-			const res = DotNet.invokeMethod(opensilver, opensilver_js_callback, callbackId, idWhereCallbackArgsAreStored, formattedArgs, returnValue || false);
-			if (returnValue) {
-				return res;
-			}
-		},
-		
-		OnCallbackFromJavaScriptError : function (idWhereCallbackArgsAreStored) {
-			DotNet.invokeMethod(opensilver, opensilver_js_error_callback, idWhereCallbackArgsAreStored);
-		}
-	};
+        OnCallbackFromJavaScriptError: function (idWhereCallbackArgsAreStored) {
+            DotNet.invokeMethod(opensilver, opensilver_js_error_callback, idWhereCallbackArgsAreStored);
+        }
+    };
 })();
 
 window.callJS = function (javaScriptToExecute) {
-    //console.log(javaScriptToExecute);
-
     var result = eval(javaScriptToExecute);
-    //console.log(result);
     var resultType = typeof result;
     if (resultType == 'string' || resultType == 'number' || resultType == 'boolean') {
-        //if (typeof result !== 'undefined' && typeof result !== 'function') {
-        //console.log("supported");
-        return result;
+       return result;
     }
-    else {
-        //console.log("not supported");
-        if (resultType === 'undefined')
-            return "[UNDEFINED]";
-        else
+    else if (result == null) {
+        return null;
+    } else {     
             return result + " [NOT USABLE DIRECTLY IN C#] (" + resultType + ")";
     }
 };
@@ -149,10 +119,9 @@ window.callJSUnmarshalled = function (javaScriptToExecute) {
     if (resultType == 'string' || resultType == 'number' || resultType == 'boolean') {
         return BINDING.js_to_mono_obj(result);
     }
-    else {
-        if (resultType === 'undefined')
-            return BINDING.js_to_mono_obj("[UNDEFINED]");
-        else
+    else if (result == null) {
+        return null;
+    } else {
             return BINDING.js_to_mono_obj(result + " [NOT USABLE DIRECTLY IN C#] (" + resultType + ")");
     }
 }; 

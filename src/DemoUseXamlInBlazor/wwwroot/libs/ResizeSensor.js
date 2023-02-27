@@ -102,199 +102,199 @@
      * @constructor
      */
     var ResizeSensor = function(element, callback) {
-        /**
-         *
-         * @constructor
-         */
-        function EventQueue() {
-            var q = [];
-            this.add = function(ev) {
-                q.push(ev);
-            };
+        ///**
+        // *
+        // * @constructor
+        // */
+        //function EventQueue() {
+        //    var q = [];
+        //    this.add = function(ev) {
+        //        q.push(ev);
+        //    };
 
-            var i, j;
-            this.call = function(sizeInfo) {
-                for (i = 0, j = q.length; i < j; i++) {
-                    q[i].call(this, sizeInfo);
-                }
-            };
+        //    var i, j;
+        //    this.call = function(sizeInfo) {
+        //        for (i = 0, j = q.length; i < j; i++) {
+        //            q[i].call(this, sizeInfo);
+        //        }
+        //    };
 
-            this.remove = function(ev) {
-                var newQueue = [];
-                for(i = 0, j = q.length; i < j; i++) {
-                    if(q[i] !== ev) newQueue.push(q[i]);
-                }
-                q = newQueue;
-            };
+        //    this.remove = function(ev) {
+        //        var newQueue = [];
+        //        for(i = 0, j = q.length; i < j; i++) {
+        //            if(q[i] !== ev) newQueue.push(q[i]);
+        //        }
+        //        q = newQueue;
+        //    };
 
-            this.length = function() {
-                return q.length;
-            }
-        }
+        //    this.length = function() {
+        //        return q.length;
+        //    }
+        //}
 
-        /**
-         *
-         * @param {HTMLElement} element
-         * @param {Function}    resized
-         */
-        function attachResizeEvent(element, resized) {
-            if (!element) return;
-            if (element.resizedAttached) {
-                element.resizedAttached.add(resized);
-                return;
-            }
+        ///**
+        // *
+        // * @param {HTMLElement} element
+        // * @param {Function}    resized
+        // */
+        //function attachResizeEvent(element, resized) {
+        //    if (!element) return;
+        //    if (element.resizedAttached) {
+        //        element.resizedAttached.add(resized);
+        //        return;
+        //    }
 
-            element.resizedAttached = new EventQueue();
-            element.resizedAttached.add(resized);
+        //    element.resizedAttached = new EventQueue();
+        //    element.resizedAttached.add(resized);
 
-            element.resizeSensor = document.createElement('div');
-            element.resizeSensor.dir = 'ltr';
-            element.resizeSensor.className = 'resize-sensor';
+        //    element.resizeSensor = document.createElement('div');
+        //    element.resizeSensor.dir = 'ltr';
+        //    element.resizeSensor.className = 'resize-sensor';
 
-            var style = {
-                pointerEvents: 'none',
-                position: 'absolute',
-                left: '0px',
-                top: '0px',
-                right: '0px',
-                bottom: '0px',
-                overflow: 'hidden',
-                zIndex: '-1',
-                visibility: 'hidden',
-                maxWidth: '100%'
-            };
-            var styleChild = {
-                position: 'absolute',
-                left: '0px',
-                top: '0px',
-                transition: '0s',
-            };
+        //    var style = {
+        //        pointerEvents: 'none',
+        //        position: 'absolute',
+        //        left: '0px',
+        //        top: '0px',
+        //        right: '0px',
+        //        bottom: '0px',
+        //        overflow: 'hidden',
+        //        zIndex: '-1',
+        //        visibility: 'hidden',
+        //        maxWidth: '100%'
+        //    };
+        //    var styleChild = {
+        //        position: 'absolute',
+        //        left: '0px',
+        //        top: '0px',
+        //        transition: '0s',
+        //    };
 
-            setStyle(element.resizeSensor, style);
+        //    setStyle(element.resizeSensor, style);
 
-            var expand = document.createElement('div');
-            expand.className = 'resize-sensor-expand';
-            setStyle(expand, style);
+        //    var expand = document.createElement('div');
+        //    expand.className = 'resize-sensor-expand';
+        //    setStyle(expand, style);
 
-            var expandChild = document.createElement('div');
-            setStyle(expandChild, styleChild);
-            expand.appendChild(expandChild);
+        //    var expandChild = document.createElement('div');
+        //    setStyle(expandChild, styleChild);
+        //    expand.appendChild(expandChild);
 
-            var shrink = document.createElement('div');
-            shrink.className = 'resize-sensor-shrink';
-            setStyle(shrink, style);
+        //    var shrink = document.createElement('div');
+        //    shrink.className = 'resize-sensor-shrink';
+        //    setStyle(shrink, style);
 
-            var shrinkChild = document.createElement('div');
-            setStyle(shrinkChild, styleChild);
-            setStyle(shrinkChild, { width: '200%', height: '200%' });
-            shrink.appendChild(shrinkChild);
+        //    var shrinkChild = document.createElement('div');
+        //    setStyle(shrinkChild, styleChild);
+        //    setStyle(shrinkChild, { width: '200%', height: '200%' });
+        //    shrink.appendChild(shrinkChild);
 
-            element.resizeSensor.appendChild(expand);
-            element.resizeSensor.appendChild(shrink);
-            element.appendChild(element.resizeSensor);
+        //    element.resizeSensor.appendChild(expand);
+        //    element.resizeSensor.appendChild(shrink);
+        //    element.appendChild(element.resizeSensor);
 
-            var computedStyle = window.getComputedStyle(element);
-            var position = computedStyle ? computedStyle.getPropertyValue('position') : null;
-            if ('absolute' !== position && 'relative' !== position && 'fixed' !== position) {
-                element.style.position = 'relative';
-            }
+        //    var computedStyle = window.getComputedStyle(element);
+        //    var position = computedStyle ? computedStyle.getPropertyValue('position') : null;
+        //    if ('absolute' !== position && 'relative' !== position && 'fixed' !== position) {
+        //        element.style.position = 'relative';
+        //    }
 
-            var dirty, rafId;
-            var size = getElementSize(element);
-            var lastWidth = 0;
-            var lastHeight = 0;
-            var initialHiddenCheck = true;
-            var lastAnimationFrame = 0;
+        //    var dirty, rafId;
+        //    var size = getElementSize(element);
+        //    var lastWidth = 0;
+        //    var lastHeight = 0;
+        //    var initialHiddenCheck = true;
+        //    var lastAnimationFrame = 0;
 
-            var resetExpandShrink = function () {
-                var width = element.offsetWidth;
-                var height = element.offsetHeight;
+        //    var resetExpandShrink = function () {
+        //        var width = element.offsetWidth;
+        //        var height = element.offsetHeight;
 
-                expandChild.style.width = (width + 10) + 'px';
-                expandChild.style.height = (height + 10) + 'px';
+        //        expandChild.style.width = (width + 10) + 'px';
+        //        expandChild.style.height = (height + 10) + 'px';
 
-                expand.scrollLeft = width + 10;
-                expand.scrollTop = height + 10;
+        //        expand.scrollLeft = width + 10;
+        //        expand.scrollTop = height + 10;
 
-                shrink.scrollLeft = width + 10;
-                shrink.scrollTop = height + 10;
-            };
+        //        shrink.scrollLeft = width + 10;
+        //        shrink.scrollTop = height + 10;
+        //    };
 
-            var reset = function() {
-                // Check if element is hidden
-                if (initialHiddenCheck) {
-                    var invisible = element.offsetWidth === 0 && element.offsetHeight === 0;
-                    if (invisible) {
-                        // Check in next frame
-                        if (!lastAnimationFrame){
-                            lastAnimationFrame = requestAnimationFrame(function(){
-                                lastAnimationFrame = 0;
+        //    var reset = function() {
+        //        // Check if element is hidden
+        //        if (initialHiddenCheck) {
+        //            var invisible = element.offsetWidth === 0 && element.offsetHeight === 0;
+        //            if (invisible) {
+        //                // Check in next frame
+        //                if (!lastAnimationFrame){
+        //                    lastAnimationFrame = requestAnimationFrame(function(){
+        //                        lastAnimationFrame = 0;
 
-                                reset();
-                            });
-                        }
+        //                        reset();
+        //                    });
+        //                }
 
-                        return;
-                    } else {
-                        // Stop checking
-                        initialHiddenCheck = false;
-                    }
-                }
+        //                return;
+        //            } else {
+        //                // Stop checking
+        //                initialHiddenCheck = false;
+        //            }
+        //        }
 
-                resetExpandShrink();
-            };
-            element.resizeSensor.resetSensor = reset;
+        //        resetExpandShrink();
+        //    };
+        //    element.resizeSensor.resetSensor = reset;
 
-            var onResized = function() {
-                rafId = 0;
+        //    var onResized = function() {
+        //        rafId = 0;
 
-                if (!dirty) return;
+        //        if (!dirty) return;
 
-                lastWidth = size.width;
-                lastHeight = size.height;
+        //        lastWidth = size.width;
+        //        lastHeight = size.height;
 
-                if (element.resizedAttached) {
-                    element.resizedAttached.call(size.width + '|' + size.height);
-                }
-            };
+        //        if (element.resizedAttached) {
+        //            element.resizedAttached.call(size.width + '|' + size.height);
+        //        }
+        //    };
 
-            var onScroll = function() {
-                size = getElementSize(element);
-                dirty = size.width !== lastWidth || size.height !== lastHeight;
+        //    var onScroll = function() {
+        //        size = getElementSize(element);
+        //        dirty = size.width !== lastWidth || size.height !== lastHeight;
 
-                if (dirty && !rafId) {
-                    rafId = requestAnimationFrame(onResized);
-                }
+        //        if (dirty && !rafId) {
+        //            rafId = requestAnimationFrame(onResized);
+        //        }
 
-                reset();
-            };
+        //        reset();
+        //    };
 
-            var addEvent = function(el, name, cb) {
-                if (el.attachEvent) {
-                    el.attachEvent('on' + name, cb);
-                } else {
-                    el.addEventListener(name, cb);
-                }
-            };
+        //    var addEvent = function(el, name, cb) {
+        //        if (el.attachEvent) {
+        //            el.attachEvent('on' + name, cb);
+        //        } else {
+        //            el.addEventListener(name, cb);
+        //        }
+        //    };
 
-            addEvent(expand, 'scroll', onScroll);
-            addEvent(shrink, 'scroll', onScroll);
+        //    addEvent(expand, 'scroll', onScroll);
+        //    addEvent(shrink, 'scroll', onScroll);
 
-            // Fix for custom Elements
-            requestAnimationFrame(reset);
-        }
+        //    // Fix for custom Elements
+        //    requestAnimationFrame(reset);
+        //}
 
-        forEachElement(element, function(elem){
-            attachResizeEvent(elem, callback);
-        });
+        //forEachElement(element, function(elem){
+        //    attachResizeEvent(elem, callback);
+        //});
 
-        this.detach = function(ev) {
-            ResizeSensor.detach(element, ev);
-        };
+        //this.detach = function(ev) {
+        //    ResizeSensor.detach(element, ev);
+        //};
 
-        this.reset = function() {
-            element.resizeSensor.resetSensor();
-        };
+        //this.reset = function() {
+        //    element.resizeSensor.resetSensor();
+        //};
     };
 
     ResizeSensor.reset = function(element) {
