@@ -1,8 +1,8 @@
 ﻿@page "/counter"
 @using OpenSilver
 
-<XamlElement Type="@typeof(CounterUserControl)"/>
-
+<XamlElement Type="@typeof(CounterUserControl)" CurrentCount="@currentCount" OnNotifyValueChanged=HandleValueChanged/>
+@*Note about the above: Setting CurrentCount like it is lets the Xaml element follow the value changes coming from razor, OnNotifyValueChanged lets the Xaml element notify the change to the razor component which can then update its own value.*@
 
 
 
@@ -16,6 +16,25 @@
 
 @code {
     private int currentCount = 0;
+
+    protected void HandleValueChanged(object info)
+    {
+        var infoAsTuple = info as Tuple<string, object>;
+        if (infoAsTuple != null)
+        {
+            string propChanged = infoAsTuple.Item1;
+            object newValue = infoAsTuple.Item2;
+
+            if(propChanged == "CurrentCount" && newValue is int)
+            {
+                currentCount = (int)newValue;
+            }
+        }
+        else
+        {
+            Console.WriteLine("Info is of type" + info.GetType().FullName);
+        }
+    }
 
     private void IncrementCount()
     {

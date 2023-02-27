@@ -13,6 +13,7 @@
 
 @code {
     object? instance;
+    bool isNOtifyingPropertyChanged = false;
 
     protected override Task OnAfterRenderAsync(bool firstRender)
     {
@@ -31,6 +32,11 @@
             if (type is null)
                 throw new InvalidOperationException("Type not found: " + this.Type ?? "(no type specified)");
             instance = Activator.CreateInstance(type);
+            if (instance is INotifyPropertyChanged)
+            {
+                INotifyPropertyChanged instanceAsInotifyPropertyChanged = instance as INotifyPropertyChanged;
+                instanceAsInotifyPropertyChanged.PropertyChanged += PropertyChanged;
+            }
 
 
             // Instantiate a new XAML "Window" (a new Visual Tree root) and set its content to be the XAML content:
@@ -40,23 +46,38 @@
             window.AttachToDomElement(div);
             window.Content = (FrameworkElement)instance;
         }
-
-        // Pass all the parameters to the XAML instance:
-        if (Parameters != null)
+        if (!isNOtifyingPropertyChanged)
         {
-            foreach (var parameter in Parameters)
+            // Pass all the parameters to the XAML instance:
+            if (Parameters != null)
             {
-                string parameterName = parameter.Key;
-                object parameterValue = parameter.Value;
-                SetPropertyValue(instance, parameterName, parameterValue);
+                foreach (var parameter in Parameters)
+                {
+                    string parameterName = parameter.Key;
+                    object parameterValue = parameter.Value;
+                    SetPropertyValue(instance, parameterName, parameterValue);
+                }
             }
         }
 
         return base.OnAfterRenderAsync(firstRender);
     }
 
+    private void PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        //getting the value:
+        var propertyInfo = this.Type.GetProperty(e.PropertyName);
+        var value = propertyInfo.GetValue(instance);
+        isNOtifyingPropertyChanged = true;
+        OnNotifyValueChanged.InvokeAsync(new Tuple<string, object>(e.PropertyName, value));
+        Task.Run(() => isNOtifyingPropertyChanged = false);
+    }
+
     [Inject]
     private IJSRuntime JSRuntime { get; set; }
+
+    [Parameter]
+    public EventCallback<Tuple<String, object>> OnNotifyValueChanged { get; set; }
 
     [Parameter]
     public Type Type { get; set; }

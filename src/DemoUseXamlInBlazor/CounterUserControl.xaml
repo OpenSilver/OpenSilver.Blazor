@@ -11,7 +11,22 @@
                 FontSize="14"
                 FontWeight="Bold"
                 Margin="0,10,0,0"/>
-        <!--<ListBox x:Name="ListBox1"/>-->
+        <ListBox x:Name="ListBox1">
+            <ListBox.Items>
+                <ListBoxItem>One</ListBoxItem>
+                <ListBoxItem>Two</ListBoxItem>
+                <ListBoxItem>Three</ListBoxItem>
+            </ListBox.Items>
+        </ListBox>
+        <ComboBox>
+            <ComboBox.Items>
+                <ComboBoxItem>first</ComboBoxItem>
+                <ComboBoxItem>second</ComboBoxItem>
+                <ComboBoxItem>third</ComboBoxItem>
+                <ComboBoxItem>fourth</ComboBoxItem>
+                <ComboBoxItem>fifth</ComboBoxItem>
+            </ComboBox.Items>
+        </ComboBox>
     </StackPanel>
 </UserControl>
     
