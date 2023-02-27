@@ -6,9 +6,12 @@
 @using System.Windows;
 @using System.Reflection;
 
-<div id="test1"><strong>XAML element not loaded, see <a href="https://opensilver.net/permalinks/xaml_not_loaded_in_blazor.aspx" target="_blank">Troubleshooting Tips</a></strong></div>
+<div style="position: relative; width: 100%; height: 100%; overflow-x: hidden; overflow-y: hidden"> @*This div prevents the elements in the XamlElement from overflowing outside of the XamlElement area (popups for example)*@
+    <div id="test1"><strong>XAML element not loaded, see <a href="https://opensilver.net/permalinks/xaml_not_loaded_in_blazor.aspx" target="_blank">Troubleshooting Tips</a></strong></div>
+</div>
 
 @code {
+
     protected override Task OnAfterRenderAsync(bool firstRender)
     {
         // Instantiate the "Application" class (only once):
@@ -16,6 +19,7 @@
         {
             Cshtml5Initializer.Initialize(new UnmarshalledJavaScriptExecutionHandler(JSRuntime));
             var _ = new System.Windows.Application();
+            Window.Current.Content = new System.Windows.Controls.Border(); //Adding a Content to the Main Window to avoid some errors.
         }
 
         // Instantiate the XAML type:
@@ -58,7 +62,7 @@
     {
         Type xamlType = obj.GetType();
         PropertyInfo? propertyInfo = xamlType.GetProperty(propertyName);
-        if(propertyInfo != null)
+        if (propertyInfo != null)
         {
             // Convert the value if needed:
             object convertedValue;
