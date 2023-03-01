@@ -23,6 +23,13 @@
             if (System.Windows.Application.Current == null)
             {
                 Cshtml5Initializer.Initialize(new UnmarshalledJavaScriptExecutionHandler(JSRuntime));
+                
+                //adding the root of the application (I think it's only useful for popups that are not attached to a control and the TextMeasurementService)
+                Interop.ExecuteJavaScript(@"var v = document.createElement('div');
+v.id='opensilver-root';
+v.style='position: absolute; width: 100%; height: 100%; overflow-x: hidden; overflow-y: hidden; z-index: -1';
+document.body.insertBefore(v, document.body.childNodes[0]);
+");
                 var _ = new System.Windows.Application();
                 Window.Current.Content = new System.Windows.Controls.Border(); //Adding a Content to the Main Window to avoid some errors.
             }
@@ -62,6 +69,7 @@
 
         return base.OnAfterRenderAsync(firstRender);
     }
+
 
     private void PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
