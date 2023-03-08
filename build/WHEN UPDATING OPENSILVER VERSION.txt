@@ -1,0 +1,5 @@
+When updating the OpenSilver version, make sure to:
+- Update the OpenSilver Dependency version in the nuspec
+- Make sure the js/css files in the location used to generate the package are of the same version as the referenced OpenSilver version
+- Update the OpenSilver reference in the OpenSilver.Blazor project.
+- Hopefully, I didn't forget anything :)

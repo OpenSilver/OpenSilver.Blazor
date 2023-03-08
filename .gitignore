@@ -351,3 +351,5 @@ MigrationBackup/
 
 # OpenSilver apps resources:
 **/wwwroot/resources
+build/ScriptsLocation.txt
+build/temp/Version.txt
